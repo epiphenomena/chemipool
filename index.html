@@ -60,6 +60,27 @@
                     </div>
                 </div>
 
+                <!-- Temp Card (Moved up) -->
+                <div class="card temp-card">
+                    <h3>Temperature</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="temp-now" data-step="-1">-</button>
+                            <input type="number" id="temp-now" value="84">
+                            <button class="step-btn" data-input="temp-now" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <p>CSI Target: -0.3 to 0.3</p>
+                    </div>
+                    <div id="temp-warning" class="warning hidden">SWG turns off at 52°F</div>
+                    <div class="stats">
+                        <p>CSI (Now): <span id="csi-now">0</span></p>
+                        <p>CSI (Target): <span id="csi-target">0</span></p>
+                    </div>
+                </div>
+
                 <!-- TA Card -->
                 <div class="card ta-card">
                     <h3>Total Alkalinity (TA)</h3>
@@ -131,9 +152,9 @@
                     <div class="input-group">
                         <label>Now</label>
                         <div class="stepper">
-                            <button class="step-btn" data-input="salt-now" data-step="-100">-</button>
-                            <input type="number" id="salt-now" step="100" value="1000">
-                            <button class="step-btn" data-input="salt-now" data-step="100">+</button>
+                            <button class="step-btn" data-input="salt-now" data-step="-50">-</button>
+                            <input type="number" id="salt-now" step="50" value="1000">
+                            <button class="step-btn" data-input="salt-now" data-step="50">+</button>
                         </div>
                     </div>
                     <div class="goal-info">Goal: <span id="salt-goal-display">1000</span></div>
@@ -162,24 +183,6 @@
                     <div class="result">
                         <p id="borate-add-result">Add <span id="borate-result">0</span> of borate</p>
                         <p id="borate-replace-result">Replace <span id="borate-replace-pcnt">0%</span> of water</p>
-                    </div>
-                </div>
-
-                <!-- Temp Card -->
-                <div class="card temp-card">
-                    <h3>Temperature</h3>
-                    <div class="input-group">
-                        <label>Now</label>
-                        <div class="stepper">
-                            <button class="step-btn" data-input="temp-now" data-step="-1">-</button>
-                            <input type="number" id="temp-now" value="84">
-                            <button class="step-btn" data-input="temp-now" data-step="1">+</button>
-                        </div>
-                    </div>
-                    <div id="temp-warning" class="warning hidden">SWG turns off at 52°F</div>
-                    <div class="stats">
-                        <p>CSI (Now): <span id="csi-now">0</span></p>
-                        <p>CSI (Target): <span id="csi-target">0</span></p>
                     </div>
                 </div>
             </div>
@@ -227,7 +230,7 @@
                                 <div class="stepper compact"><button type="button" class="step-btn" data-input="log-cya" data-step="-5">-</button><input type="number" id="log-cya"><button type="button" class="step-btn" data-input="log-cya" data-step="5">+</button></div>
                             </div>
                             <div class="input-group"><label>Salt</label>
-                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-salt" data-step="-100">-</button><input type="number" id="log-salt"><button type="button" class="step-btn" data-input="log-salt" data-step="100">+</button></div>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-salt" data-step="-50">-</button><input type="number" id="log-salt" step="50"><button type="button" class="step-btn" data-input="log-salt" data-step="50">+</button></div>
                             </div>
                             <div class="input-group"><label>Borate</label>
                                 <div class="stepper compact"><button type="button" class="step-btn" data-input="log-borate" data-step="-5">-</button><input type="number" id="log-borate"><button type="button" class="step-btn" data-input="log-borate" data-step="5">+</button></div>
@@ -270,22 +273,8 @@
                         <input type="file" id="csv-file-input" accept=".csv" class="hidden">
                     </div>
                 </div>
-                <div class="table-container">
-                    <table id="log-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>FC</th>
-                                <th>pH</th>
-                                <th>Maint</th>
-                                <th>Notes</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="log-body">
-                            <!-- Logs injected here -->
-                        </tbody>
-                    </table>
+                <div id="log-list" class="log-list">
+                    <!-- Logs injected here -->
                 </div>
             </div>
         </section>
@@ -358,9 +347,9 @@
                     <div class="input-row">
                         <label>Salt</label>
                         <div class="stepper compact">
-                            <button class="step-btn" data-input="goal-salt" data-step="-100">-</button>
-                            <input type="number" id="goal-salt" value="1000" step="100">
-                            <button class="step-btn" data-input="goal-salt" data-step="100">+</button>
+                            <button class="step-btn" data-input="goal-salt" data-step="-50">-</button>
+                            <input type="number" id="goal-salt" value="1000" step="50">
+                            <button class="step-btn" data-input="goal-salt" data-step="50">+</button>
                         </div>
                     </div>
                     <div class="input-row">

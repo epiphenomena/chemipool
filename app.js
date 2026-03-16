@@ -265,30 +265,42 @@ function updateUI() {
 }
 
 function renderLogs() {
-    elements.logBody.innerHTML = '';
+    const container = document.getElementById('log-list');
+    container.innerHTML = '';
     [...state.logs].sort((a,b) => b.date.localeCompare(a.date)).forEach((log, index) => {
-        const tr = document.createElement('tr');
+        const item = document.createElement('div');
+        item.className = 'log-item';
         const maintStr = log.maintenance.join(', ');
-        tr.innerHTML = `
-            <td>${log.date}</td>
-            <td>${log.measurements.fc || '-'}</td>
-            <td>${log.measurements.ph || '-'}</td>
-            <td>${maintStr || '-'}</td>
-            <td>${log.notes || '-'}</td>
-            <td><button class="btn-delete" data-date="${log.date}" data-index="${index}">Delete</button></td>
+
+        item.innerHTML = `
+            <div class="log-item-header">
+                <span class="log-item-date">${log.date}</span>
+                <button class="btn-delete" data-date="${log.date}" data-index="${index}">Delete</button>
+            </div>
+            <div class="log-item-stats">
+                <div><span>FC:</span> <b>${log.measurements.fc ?? '-'}</b></div>
+                <div><span>pH:</span> <b>${log.measurements.ph ?? '-'}</b></div>
+                <div><span>TA:</span> <b>${log.measurements.ta ?? '-'}</b></div>
+                <div><span>CH:</span> <b>${log.measurements.ch ?? '-'}</b></div>
+                <div><span>CYA:</span> <b>${log.measurements.cya ?? '-'}</b></div>
+                <div><span>Salt:</span> <b>${log.measurements.salt ?? '-'}</b></div>
+                <div><span>Temp:</span> <b>${log.measurements.temp ?? '-'}</b></div>
+            </div>
+            ${maintStr ? `<div class="log-item-maint">Maintenance: ${maintStr}</div>` : ''}
+            ${log.notes ? `<div class="log-item-notes">${log.notes}</div>` : ''}
         `;
-        elements.logBody.appendChild(tr);
+        container.appendChild(item);
     });
 
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const date = btn.dataset.date;
-            const idx = parseInt(btn.dataset.index);
-            // Delete by date and original index from sorted list is tricky, let's just use original state index
-            const originalIndex = state.logs.findIndex(l => l.date === date); // Approximate
-            state.logs.splice(originalIndex, 1);
-            saveState();
-            renderLogs();
+            const originalIndex = state.logs.findIndex(l => l.date === date);
+            if (originalIndex !== -1) {
+                state.logs.splice(originalIndex, 1);
+                saveState();
+                renderLogs();
+            }
         });
     });
 }
