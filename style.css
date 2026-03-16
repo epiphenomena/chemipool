@@ -116,7 +116,7 @@ main {
     margin-bottom: 0.5rem;
 }
 
-input[type="number"], select {
+input[type="number"], input[type="date"], select {
     width: 100%;
     padding: 0.8rem 0.4rem;
     background-color: var(--input-bg);
@@ -127,6 +127,11 @@ input[type="number"], select {
     outline: none;
     /* Hide native spin buttons */
     -moz-appearance: textfield;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) sepia(100%) saturate(10000%) hue-rotate(180deg);
+    cursor: pointer;
 }
 
 input::-webkit-outer-spin-button,
