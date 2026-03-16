@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoolMath Modern</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <header>
+        <h1>PoolMath</h1>
+        <nav>
+            <button id="btn-measurements" class="active">Measurements</button>
+            <button id="btn-logs">Logs</button>
+            <button id="btn-settings">Settings</button>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <!-- Measurements View -->
+        <section id="view-measurements" class="view">
+            <div class="card-grid">
+                <!-- FC Card -->
+                <div class="card fc-card">
+                    <h3>Free Chlorine (FC)</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="fc-now" data-step="-0.5">-</button>
+                            <input type="number" id="fc-now" step="0.5" value="4">
+                            <button class="step-btn" data-input="fc-now" data-step="0.5">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="fc-goal-display">4</span></div>
+                    <div class="result">
+                        <p>Add <span id="fc-result-1">0</span> of bleach</p>
+                        <p>or <span id="fc-result-2">0</span> of <span id="fc-source-display">trichlor</span></p>
+                    </div>
+                </div>
+
+                <!-- pH Card -->
+                <div class="card ph-card">
+                    <h3>pH</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="ph-now" data-step="-0.1">-</button>
+                            <input type="number" id="ph-now" step="0.1" value="7.5">
+                            <button class="step-btn" data-input="ph-now" data-step="0.1">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="ph-goal-display">7.5</span></div>
+                    <div class="recommendation">
+                        <p>Ideal: 7.6-7.8</p>
+                        <p>Range: 7.2-8.0</p>
+                    </div>
+                    <div class="result">
+                        <p id="ph-result-up">Add <span id="ph-up-amount">0</span> to raise pH</p>
+                        <p id="ph-result-down">Add <span id="ph-down-amount">0</span> to lower pH</p>
+                    </div>
+                </div>
+
+                <!-- TA Card -->
+                <div class="card ta-card">
+                    <h3>Total Alkalinity (TA)</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="ta-now" data-step="-10">-</button>
+                            <input type="number" id="ta-now" step="10" value="100">
+                            <button class="step-btn" data-input="ta-now" data-step="10">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="ta-goal-display">100</span></div>
+                    <div class="recommendation">
+                        <p>Ideal: 60-80</p>
+                        <p>Range: 50-90</p>
+                    </div>
+                    <div class="result">
+                        <p>Add <span id="ta-result">0</span> of baking soda</p>
+                    </div>
+                </div>
+
+                <!-- CH Card -->
+                <div class="card ch-card">
+                    <h3>Calcium Hardness (CH)</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="ch-now" data-step="-25">-</button>
+                            <input type="number" id="ch-now" step="25" value="250">
+                            <button class="step-btn" data-input="ch-now" data-step="25">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="ch-goal-display">250</span></div>
+                    <div class="recommendation">
+                        <p>Ideal: 50-550</p>
+                        <p>Range: 0-650</p>
+                    </div>
+                    <div class="result">
+                        <p id="ch-add-result">Add <span id="ch-result">0</span> of calcium chloride</p>
+                        <p id="ch-replace-result">Replace <span id="ch-replace-pcnt">0%</span> of water</p>
+                    </div>
+                </div>
+
+                <!-- CYA Card -->
+                <div class="card cya-card">
+                    <h3>Cyanuric Acid (CYA)</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="cya-now" data-step="-5">-</button>
+                            <input type="number" id="cya-now" step="5" value="40">
+                            <button class="step-btn" data-input="cya-now" data-step="5">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="cya-goal-display">40</span></div>
+                    <div class="recommendation">
+                        <p>Ideal: 70-80</p>
+                        <p>Range: 60-90</p>
+                    </div>
+                    <div class="result">
+                        <p id="cya-add-result">Add <span id="cya-result">0</span> of stabilizer</p>
+                        <p id="cya-replace-result">Replace <span id="cya-replace-pcnt">0%</span> of water</p>
+                    </div>
+                </div>
+
+                <!-- Salt Card -->
+                <div class="card salt-card">
+                    <h3>Salt</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="salt-now" data-step="-100">-</button>
+                            <input type="number" id="salt-now" step="100" value="1000">
+                            <button class="step-btn" data-input="salt-now" data-step="100">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="salt-goal-display">1000</span></div>
+                    <div class="recommendation">
+                        <p>Recommended: 3600-4500</p>
+                        <p>Note: SWG turns off if &lt; 52°F</p>
+                    </div>
+                    <div class="result">
+                        <p id="salt-add-result">Add <span id="salt-result">0</span> of salt</p>
+                        <p id="salt-replace-result">Replace <span id="salt-replace-pcnt">0%</span> of water</p>
+                    </div>
+                </div>
+
+                <!-- Borate Card -->
+                <div class="card borate-card">
+                    <h3>Borate</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="borate-now" data-step="-5">-</button>
+                            <input type="number" id="borate-now" step="5" value="0">
+                            <button class="step-btn" data-input="borate-now" data-step="5">+</button>
+                        </div>
+                    </div>
+                    <div class="goal-info">Goal: <span id="borate-goal-display">0</span></div>
+                    <div class="result">
+                        <p id="borate-add-result">Add <span id="borate-result">0</span> of borate</p>
+                        <p id="borate-replace-result">Replace <span id="borate-replace-pcnt">0%</span> of water</p>
+                    </div>
+                </div>
+
+                <!-- Temp Card -->
+                <div class="card temp-card">
+                    <h3>Temperature</h3>
+                    <div class="input-group">
+                        <label>Now</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="temp-now" data-step="-1">-</button>
+                            <input type="number" id="temp-now" value="84">
+                            <button class="step-btn" data-input="temp-now" data-step="1">+</button>
+                        </div>
+                    </div>
+                    <div id="temp-warning" class="warning hidden">SWG turns off at 52°F</div>
+                    <div class="stats">
+                        <p>CSI (Now): <span id="csi-now">0</span></p>
+                        <p>CSI (Target): <span id="csi-target">0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary / Suggestions Card -->
+            <div class="card summary-card">
+                <h3>Suggested Levels</h3>
+                <div class="suggestion-grid">
+                    <div>SWG Min: <span id="sug-swg-min">0</span></div>
+                    <div>SWG Target: <span id="sug-swg-tgt">0</span></div>
+                    <div>Normal Min: <span id="sug-nor-min">0</span></div>
+                    <div>Normal Target: <span id="sug-nor-tgt">0</span></div>
+                    <div>Shock: <span id="sug-shock">0</span></div>
+                    <div>Mustard Shock: <span id="sug-mustard">0</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs View -->
+        <section id="view-logs" class="view hidden">
+            <div class="card log-form-card">
+                <h3>Record New Entry</h3>
+                <form id="log-form">
+                    <div class="input-group">
+                        <label>Date</label>
+                        <input type="date" id="log-date">
+                    </div>
+                    
+                    <div class="log-section">
+                        <h4>Measurements</h4>
+                        <div class="log-input-grid">
+                            <div class="input-group"><label>FC</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-fc" data-step="-0.5">-</button><input type="number" id="log-fc" step="0.5"><button type="button" class="step-btn" data-input="log-fc" data-step="0.5">+</button></div>
+                            </div>
+                            <div class="input-group"><label>pH</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-ph" data-step="-0.1">-</button><input type="number" id="log-ph" step="0.1"><button type="button" class="step-btn" data-input="log-ph" data-step="0.1">+</button></div>
+                            </div>
+                            <div class="input-group"><label>TA</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-ta" data-step="-10">-</button><input type="number" id="log-ta"><button type="button" class="step-btn" data-input="log-ta" data-step="10">+</button></div>
+                            </div>
+                            <div class="input-group"><label>CH</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-ch" data-step="-25">-</button><input type="number" id="log-ch"><button type="button" class="step-btn" data-input="log-ch" data-step="25">+</button></div>
+                            </div>
+                            <div class="input-group"><label>CYA</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-cya" data-step="-5">-</button><input type="number" id="log-cya"><button type="button" class="step-btn" data-input="log-cya" data-step="5">+</button></div>
+                            </div>
+                            <div class="input-group"><label>Salt</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-salt" data-step="-100">-</button><input type="number" id="log-salt"><button type="button" class="step-btn" data-input="log-salt" data-step="100">+</button></div>
+                            </div>
+                            <div class="input-group"><label>Borate</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-borate" data-step="-5">-</button><input type="number" id="log-borate"><button type="button" class="step-btn" data-input="log-borate" data-step="5">+</button></div>
+                            </div>
+                            <div class="input-group"><label>Temp</label>
+                                <div class="stepper compact"><button type="button" class="step-btn" data-input="log-temp" data-step="-1">-</button><input type="number" id="log-temp"><button type="button" class="step-btn" data-input="log-temp" data-step="1">+</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4>Maintenance Tasks</h4>
+                        <div class="checkbox-grid">
+                            <label><input type="checkbox" name="maint" value="skimmers"> Skimmers</label>
+                            <label><input type="checkbox" name="maint" value="cleaner_bag"> Cleaner Bag</label>
+                            <label><input type="checkbox" name="maint" value="pump_filter"> Pump Basket</label>
+                            <label><input type="checkbox" name="maint" value="brush"> Brushing</label>
+                            <label><input type="checkbox" name="maint" value="vacuum"> Vacuuming</label>
+                            <label><input type="checkbox" name="maint" value="filter_clean"> Filter Clean</label>
+                            <label><input type="checkbox" name="maint" value="swg_vinegar"> SWG (Vinegar)</label>
+                            <label><input type="checkbox" name="maint" value="swg_hcl"> SWG (HCL)</label>
+                        </div>
+                    </div>
+
+                    <div class="log-section">
+                        <h4>Additions & Notes</h4>
+                        <textarea id="log-notes" placeholder="Chemicals added or general notes..."></textarea>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Save Log & Update Levels</button>
+                </form>
+            </div>
+
+            <div class="card log-history-card">
+                <div class="header-with-action">
+                    <h3>Log History</h3>
+                    <div class="action-group">
+                        <button id="btn-upload-csv" class="secondary-btn">Upload CSV</button>
+                        <button id="btn-download-csv" class="secondary-btn">Download CSV</button>
+                        <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="log-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>FC</th>
+                                <th>pH</th>
+                                <th>Maint</th>
+                                <th>Notes</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-body">
+                            <!-- Logs injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="view-settings" class="view hidden">
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Pool Setup</h3>
+                    <div class="input-group">
+                        <label>Units</label>
+                        <select id="set-units">
+                            <option value="0">U.S.</option>
+                            <option value="1">Metric</option>
+                            <option value="2">Imperial</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Pool Size (<span class="unit-label">gallons</span>)</label>
+                        <div class="stepper">
+                            <button class="step-btn" data-input="set-size" data-step="-100">-</button>
+                            <input type="number" id="set-size" value="10000" step="100">
+                            <button class="step-btn" data-input="set-size" data-step="100">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Goal Levels</h3>
+                    <div class="input-row">
+                        <label>FC</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-fc" data-step="-0.5">-</button>
+                            <input type="number" id="goal-fc" value="4" step="0.5">
+                            <button class="step-btn" data-input="goal-fc" data-step="0.5">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>pH</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-ph" data-step="-0.1">-</button>
+                            <input type="number" id="goal-ph" value="7.5" step="0.1">
+                            <button class="step-btn" data-input="goal-ph" data-step="0.1">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>TA</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-ta" data-step="-10">-</button>
+                            <input type="number" id="goal-ta" value="100" step="10">
+                            <button class="step-btn" data-input="goal-ta" data-step="10">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>CH</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-ch" data-step="-25">-</button>
+                            <input type="number" id="goal-ch" value="250" step="25">
+                            <button class="step-btn" data-input="goal-ch" data-step="25">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>CYA</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-cya" data-step="-5">-</button>
+                            <input type="number" id="goal-cya" value="40" step="5">
+                            <button class="step-btn" data-input="goal-cya" data-step="5">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>Salt</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-salt" data-step="-100">-</button>
+                            <input type="number" id="goal-salt" value="1000" step="100">
+                            <button class="step-btn" data-input="goal-salt" data-step="100">+</button>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>Borate</label>
+                        <div class="stepper compact">
+                            <button class="step-btn" data-input="goal-borate" data-step="-5">-</button>
+                            <input type="number" id="goal-borate" value="0" step="5">
+                            <button class="step-btn" data-input="goal-borate" data-step="5">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Additive Preferences</h3>
+                    <div class="input-group">
+                        <label>Bleach Strength (%)</label>
+                        <input type="number" id="set-fc-pcnt" value="6" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Bleach Jug Size</label>
+                        <select id="set-fc-jug">
+                            <option value="0">96 oz</option>
+                            <option value="1">128 oz</option>
+                            <option value="2">174 oz</option>
+                            <option value="3">182 oz</option>
+                            <option value="4">30 oz</option>
+                            <option value="5">64 oz</option>
+                            <option value="6">121 oz</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Secondary Chlorine</label>
+                        <select id="set-fc-pop">
+                            <option value="0">trichlor</option>
+                            <option value="1">dichlor</option>
+                            <option value="2">cal-hypo 48%</option>
+                            <option value="3">cal-hypo 53%</option>
+                            <option value="4">cal-hypo 65%</option>
+                            <option value="5">cal-hypo 73%</option>
+                            <option value="6">lithium-hypo</option>
+                            <option value="7">chlorine gas</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Acid Type</label>
+                        <select id="set-ma-pop">
+                            <option value="0">15.7% - 10° Baumé</option>
+                            <option value="1">28.3% - 18° Baumé</option>
+                            <option value="2" selected>31.45% - 20° Baumé</option>
+                            <option value="3">34.6% - 22° Baumé</option>
+                            <option value="4">14.5%</option>
+                            <option value="5">29%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

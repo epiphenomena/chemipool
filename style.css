@@ -1,0 +1,387 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --primary-color: #2979ff;
+    --accent-color: #448aff;
+    --text-main: #ffffff;
+    --text-dim: #b0b0b0;
+    --input-bg: #2c2c2c;
+    --border-color: #333333;
+    --danger: #ff5252;
+    --success: #69f0ae;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+}
+
+header {
+    background-color: var(--card-bg);
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+nav button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+nav button.active {
+    color: var(--text-main);
+    border-bottom-color: var(--primary-color);
+}
+
+main {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.view {
+    display: block;
+}
+
+.view.hidden {
+    display: none;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+.card {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+}
+
+input[type="number"], select {
+    width: 100%;
+    padding: 0.8rem 0.4rem;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 1rem;
+    outline: none;
+    /* Hide native spin buttons */
+    -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: var(--primary-color);
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.step-btn:active {
+    opacity: 0.8;
+}
+
+.stepper input {
+    text-align: center;
+}
+
+.goal-info {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+}
+
+.result {
+    background-color: rgba(41, 121, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.result p {
+    margin-bottom: 0.5rem;
+}
+
+.result p:last-child {
+    margin-bottom: 0;
+}
+
+.result span {
+    font-weight: bold;
+    color: var(--success);
+}
+
+.stats {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.stats span {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.suggestion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.suggestion-grid span {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.input-row label {
+    width: 60px;
+    font-size: 0.9rem;
+}
+
+.input-row input {
+    flex: 1;
+}
+
+.stepper.compact .step-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+}
+
+.recommendation {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    background: rgba(255,255,255,0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.warning {
+    margin-top: 0.5rem;
+    color: var(--danger);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.secondary-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--primary-color);
+    background: none;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.log-section {
+    margin-bottom: 1.5rem;
+}
+
+.log-section h4 {
+    font-size: 1rem;
+    color: var(--accent-color);
+    margin-bottom: 0.8rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.log-input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.8rem;
+}
+
+.checkbox-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkbox-grid input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-main);
+    padding: 0.8rem;
+    font-size: 1rem;
+    outline: none;
+    resize: vertical;
+}
+
+.header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th, td {
+    text-align: left;
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    color: var(--text-dim);
+    font-weight: normal;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+.hidden {
+    display: none !important;
+}
