@@ -77,6 +77,23 @@ main {
     display: none !important;
 }
 
+.days-since-log-container {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.days-since-log-container b {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+}
+
+.days-since-log-container.warning b {
+    color: var(--danger);
+}
+
 .card-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -327,6 +344,11 @@ textarea {
     cursor: pointer;
 }
 
+.primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .secondary-btn {
     padding: 0.3rem 0.6rem;
     border-radius: 4px;
@@ -342,6 +364,56 @@ textarea {
     border: none;
     background-color: var(--primary-color);
     color: white;
+}
+
+.task-manager-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.task-manager-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.task-manager-btns {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.task-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-dim);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.task-btn:hover:not(:disabled) {
+    color: var(--text-main);
+    border-color: var(--primary-color);
+}
+
+.task-btn.delete-task {
+    color: var(--danger);
+}
+
+.task-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
 }
 
 .warning {
@@ -365,10 +437,11 @@ textarea {
 }
 
 .log-item {
-    background: rgba(255,255,255,0.02);
+    background: var(--card-bg);
     padding: 0.6rem;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .log-item-header {
@@ -416,15 +489,17 @@ textarea {
 
 .toast {
     position: fixed;
-    bottom: 1rem;
+    top: 5rem; /* Moved from bottom to prevent overlapping submit button */
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--primary-color);
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     z-index: 1000;
+    font-weight: bold;
+    font-size: 0.9rem;
 }
 
 .hidden {

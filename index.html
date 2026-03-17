@@ -19,6 +19,9 @@
     <main id="main-content">
         <!-- Dashboard View (Merged Measurements & Record) -->
         <section id="view-measurements" class="view">
+            <div id="days-since-log-container" class="days-since-log-container">
+                <!-- Populated via JS -->
+            </div>
             <div class="card-grid">
                 <!-- FC Card -->
                 <div class="card fc-card">
@@ -254,16 +257,9 @@
                     <form id="log-form">
                         <div class="log-controls-grid">
                             <div class="log-maint-col">
-                                <label style="display: block; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">Maintenance Tasks</label>
-                                <div class="checkbox-grid">
-                                    <label><input type="checkbox" name="maint" value="skimmers"> Skimmers</label>
-                                    <label><input type="checkbox" name="maint" value="cleaner_bag"> Cleaner Bag</label>
-                                    <label><input type="checkbox" name="maint" value="pump_filter"> Pump Basket</label>
-                                    <label><input type="checkbox" name="maint" value="brush"> Brushing</label>
-                                    <label><input type="checkbox" name="maint" value="vacuum"> Vacuuming</label>
-                                    <label><input type="checkbox" name="maint" value="filter_clean"> Filter Clean</label>
-                                    <label><input type="checkbox" name="maint" value="swg_vinegar"> SWG (Vinegar)</label>
-                                    <label><input type="checkbox" name="maint" value="swg_hcl"> SWG (HCL)</label>
+                                <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.25rem;">Maintenance Tasks</label>
+                                <div id="maint-checkbox-grid" class="checkbox-grid">
+                                    <!-- Populated via JS -->
                                 </div>
                             </div>
                             <div class="log-details-col">
@@ -278,7 +274,7 @@
                             </div>
                             <div class="log-action-col">
                                 <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
-                                    <button type="submit" class="primary-btn">Save Log & Update State</button>
+                                    <button type="submit" id="btn-save-log" class="primary-btn">Save Log & Update State</button>
                                 </div>
                             </div>
                         </div>
@@ -289,18 +285,16 @@
 
         <!-- History View -->
         <section id="view-logs" class="view hidden">
-            <div class="card log-history-card">
-                <div class="header-with-action">
-                    <h3>Log History</h3>
-                    <div class="action-group">
-                        <button id="btn-upload-csv" class="secondary-btn">Upload CSV</button>
-                        <button id="btn-download-csv" class="secondary-btn">Download CSV</button>
-                        <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                    </div>
+            <div class="header-with-action">
+                <h3 style="font-size: 1.1rem; color: var(--accent-color);">Log History</h3>
+                <div class="action-group">
+                    <button id="btn-upload-csv" class="secondary-btn">Upload CSV</button>
+                    <button id="btn-download-csv" class="secondary-btn">Download CSV</button>
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
                 </div>
-                <div id="log-list" class="log-list">
-                    <!-- Logs injected here -->
-                </div>
+            </div>
+            <div id="log-list" class="log-list">
+                <!-- Logs injected here -->
             </div>
         </section>
 
@@ -319,11 +313,7 @@
                     </div>
                     <div class="input-group">
                         <label>Pool Size (<span class="unit-label">gallons</span>)</label>
-                        <div class="stepper-btns">
-                            <button class="step-btn" data-input="set-size" data-step="-100">-</button>
-                            <input type="number" id="set-size" value="10000" step="100">
-                            <button class="step-btn" data-input="set-size" data-step="100">+</button>
-                        </div>
+                        <input type="number" id="set-size" value="10000" step="100">
                     </div>
                 </div>
 
@@ -337,6 +327,17 @@
                         <div class="input-group"><label>CYA</label><input type="number" id="goal-cya" value="40" step="5"></div>
                         <div class="input-group"><label>Salt</label><input type="number" id="goal-salt" value="1000" step="50"></div>
                         <div class="input-group"><label>Borate</label><input type="number" id="goal-borate" value="0" step="5"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Maintenance Tasks</h3>
+                    <div class="input-group" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <input type="text" id="new-task-input" placeholder="Add new task..." style="flex: 1;">
+                        <button id="btn-add-task" class="secondary-btn">Add</button>
+                    </div>
+                    <div id="maint-task-list" class="task-manager-list">
+                        <!-- Populated via JS -->
                     </div>
                 </div>
 

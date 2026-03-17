@@ -5,6 +5,11 @@ import {
 
 // --- State Management ---
 
+const DEFAULT_MAINTENANCE_TASKS = [
+    "Skimmers", "Cleaner Bag", "Pump Basket", "Brushing", 
+    "Vacuuming", "Filter Clean", "SWG (Vinegar)", "SWG (HCL)"
+];
+
 const DEFAULT_STATE = {
     unit: 0,
     size: 10000,
@@ -16,12 +21,14 @@ const DEFAULT_STATE = {
     salt: { now: 1000, goal: 1000 },
     borate: { now: 0, goal: 0, pop: 0 },
     temp: 84,
-    logs: []
+    logs: [],
+    maintenanceTasks: DEFAULT_MAINTENANCE_TASKS
 };
 
 let state = JSON.parse(localStorage.getItem('poolState')) || DEFAULT_STATE;
 state = { ...DEFAULT_STATE, ...state };
 if (!state.logs) state.logs = [];
+if (!state.maintenanceTasks) state.maintenanceTasks = [...DEFAULT_MAINTENANCE_TASKS];
 
 function saveState() {
     localStorage.setItem('poolState', JSON.stringify(state));
@@ -36,6 +43,7 @@ const elements = {
     viewMeasurements: document.getElementById('view-measurements'),
     viewLogs: document.getElementById('view-logs'),
     viewSettings: document.getElementById('view-settings'),
+    daysSinceLog: document.getElementById('days-since-log-container'),
 
     // Measurements
     fcNow: document.getElementById('fc-now'),
@@ -60,6 +68,9 @@ const elements = {
     setFcPcnt: document.getElementById('set-fc-pcnt'),
     setFcPop: document.getElementById('set-fc-pop'),
     setMaPop: document.getElementById('set-ma-pop'),
+    newTaskInput: document.getElementById('new-task-input'),
+    btnAddTask: document.getElementById('btn-add-task'),
+    maintTaskList: document.getElementById('maint-task-list'),
 
     // Displays
     fcGoalDisplay: document.getElementById('fc-goal-display'),
@@ -113,6 +124,8 @@ const elements = {
     logForm: document.getElementById('log-form'),
     logDate: document.getElementById('log-date'),
     logNotes: document.getElementById('log-notes'),
+    maintCheckboxGrid: document.getElementById('maint-checkbox-grid'),
+    btnSaveLog: document.getElementById('btn-save-log'),
     btnDownloadCsv: document.getElementById('btn-download-csv'),
     btnUploadCsv: document.getElementById('btn-upload-csv'),
     csvFileInput: document.getElementById('csv-file-input'),
@@ -121,11 +134,14 @@ const elements = {
 
 // --- Utilities ---
 
-function showToast(msg) {
+function showToast(msg, btnToDisable = null) {
     elements.toast.textContent = msg;
     elements.toast.classList.remove('hidden');
+    if (btnToDisable) btnToDisable.disabled = true;
+    
     setTimeout(() => {
         elements.toast.classList.add('hidden');
+        if (btnToDisable) btnToDisable.disabled = false;
     }, 3000);
 }
 
@@ -156,12 +172,75 @@ function init() {
 
     elements.logDate.valueAsDate = new Date();
 
+    renderMaintenanceCheckboxes();
+    renderMaintenanceTasksManager();
     updateUI();
     renderLogs();
     attachListeners();
 }
 
 // --- Logic ---
+
+function renderMaintenanceCheckboxes() {
+    elements.maintCheckboxGrid.innerHTML = '';
+    state.maintenanceTasks.forEach(task => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'maint';
+        checkbox.value = task.toLowerCase().replace(/\s+/g, '_');
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' ' + task));
+        elements.maintCheckboxGrid.appendChild(label);
+    });
+}
+
+function renderMaintenanceTasksManager() {
+    elements.maintTaskList.innerHTML = '';
+    state.maintenanceTasks.forEach((task, index) => {
+        const item = document.createElement('div');
+        item.className = 'task-manager-item';
+        item.innerHTML = `
+            <span>${task}</span>
+            <div class="task-manager-btns">
+                <button class="task-btn move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
+                <button class="task-btn move-down" data-index="${index}" ${index === state.maintenanceTasks.length - 1 ? 'disabled' : ''}>↓</button>
+                <button class="task-btn delete-task" data-index="${index}">×</button>
+            </div>
+        `;
+        elements.maintTaskList.appendChild(item);
+    });
+
+    // Attach manager listeners
+    elements.maintTaskList.querySelectorAll('.delete-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.maintenanceTasks.splice(parseInt(btn.dataset.index), 1);
+            saveState();
+            renderMaintenanceTasksManager();
+            renderMaintenanceCheckboxes();
+        });
+    });
+
+    elements.maintTaskList.querySelectorAll('.move-up').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx = parseInt(btn.dataset.index);
+            [state.maintenanceTasks[idx], state.maintenanceTasks[idx - 1]] = [state.maintenanceTasks[idx - 1], state.maintenanceTasks[idx]];
+            saveState();
+            renderMaintenanceTasksManager();
+            renderMaintenanceCheckboxes();
+        });
+    });
+
+    elements.maintTaskList.querySelectorAll('.move-down').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx = parseInt(btn.dataset.index);
+            [state.maintenanceTasks[idx], state.maintenanceTasks[idx + 1]] = [state.maintenanceTasks[idx + 1], state.maintenanceTasks[idx]];
+            saveState();
+            renderMaintenanceTasksManager();
+            renderMaintenanceCheckboxes();
+        });
+    });
+}
 
 function updateUI() {
     elements.fcGoalDisplay.textContent = state.fc.goal;
@@ -253,6 +332,33 @@ function updateUI() {
     elements.sugNorTgt.textContent = sug.norTgt1 + "-" + sug.norTgt2;
     elements.sugShock.textContent = sug.shock;
     elements.sugMustard.textContent = sug.mustard;
+
+    updateDaysSinceLog();
+}
+
+function updateDaysSinceLog() {
+    if (state.logs.length === 0) {
+        elements.daysSinceLog.innerHTML = "No logs recorded yet.";
+        return;
+    }
+
+    const lastLog = [...state.logs].sort((a,b) => b.date.localeCompare(a.date))[0];
+    const lastDate = new Date(lastLog.date);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    lastDate.setHours(0,0,0,0);
+    
+    const diffTime = today - lastDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+        elements.daysSinceLog.innerHTML = "Last log recorded <b>today</b>.";
+        elements.daysSinceLog.classList.remove('warning');
+    } else {
+        elements.daysSinceLog.innerHTML = `Last log recorded <b>${diffDays}</b> day${diffDays > 1 ? 's' : ''} ago.`;
+        if (diffDays >= 3) elements.daysSinceLog.classList.add('warning');
+        else elements.daysSinceLog.classList.remove('warning');
+    }
 }
 
 function renderLogs() {
@@ -291,6 +397,7 @@ function renderLogs() {
                 state.logs.splice(originalIndex, 1);
                 saveState();
                 renderLogs();
+                updateDaysSinceLog();
             }
         });
     });
@@ -355,6 +462,7 @@ function uploadCSV(file) {
         state.logs = [...state.logs, ...newLogs];
         saveState();
         renderLogs();
+        updateDaysSinceLog();
         showToast(`Imported ${newLogs.length} logs!`);
     };
     reader.readAsText(file);
@@ -417,6 +525,17 @@ function attachListeners() {
         elements.suggestionsPanel.classList.toggle('hidden');
     });
 
+    elements.btnAddTask.addEventListener('click', () => {
+        const taskName = elements.newTaskInput.value.trim();
+        if (taskName) {
+            state.maintenanceTasks.push(taskName);
+            saveState();
+            renderMaintenanceTasksManager();
+            renderMaintenanceCheckboxes();
+            elements.newTaskInput.value = '';
+        }
+    });
+
     elements.logForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const measurements = {
@@ -429,9 +548,10 @@ function attachListeners() {
         state.logs.push({ date: elements.logDate.value, measurements, maintenance, notes: elements.logNotes.value });
         saveState();
         renderLogs();
+        updateDaysSinceLog();
         document.querySelectorAll('input[name="maint"]').forEach(cb => cb.checked = false);
         elements.logNotes.value = '';
-        showToast('Log saved!');
+        showToast('Log saved!', elements.btnSaveLog);
     });
 
     elements.btnDownloadCsv.addEventListener('click', downloadCSV);
