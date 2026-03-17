@@ -58,7 +58,6 @@ const elements = {
     goalSalt: document.getElementById('goal-salt'),
     goalBorate: document.getElementById('goal-borate'),
     setFcPcnt: document.getElementById('set-fc-pcnt'),
-    setFcJug: document.getElementById('set-fc-jug'),
     setFcPop: document.getElementById('set-fc-pop'),
     setMaPop: document.getElementById('set-ma-pop'),
 
@@ -107,20 +106,13 @@ const elements = {
     sugNorTgt: document.getElementById('sug-nor-tgt'),
     sugShock: document.getElementById('sug-shock'),
     sugMustard: document.getElementById('sug-mustard'),
+    toggleSuggestions: document.getElementById('toggle-suggestions'),
+    suggestionsPanel: document.getElementById('suggestions-panel'),
 
     // Logs View
     logForm: document.getElementById('log-form'),
     logDate: document.getElementById('log-date'),
-    logFc: document.getElementById('log-fc'),
-    logPh: document.getElementById('log-ph'),
-    logTa: document.getElementById('log-ta'),
-    logCh: document.getElementById('log-ch'),
-    logCya: document.getElementById('log-cya'),
-    logSalt: document.getElementById('log-salt'),
-    logBorate: document.getElementById('log-borate'),
-    logTemp: document.getElementById('log-temp'),
     logNotes: document.getElementById('log-notes'),
-    logBody: document.getElementById('log-body'),
     btnDownloadCsv: document.getElementById('btn-download-csv'),
     btnUploadCsv: document.getElementById('btn-upload-csv'),
     csvFileInput: document.getElementById('csv-file-input'),
@@ -146,7 +138,6 @@ function init() {
     elements.fcNow.value = state.fc.now;
     elements.goalFc.value = state.fc.goal;
     elements.setFcPcnt.value = state.fc.pcnt;
-    elements.setFcJug.value = state.fc.jug;
     elements.setFcPop.value = state.fc.pop;
     elements.phNow.value = state.ph.now;
     elements.goalPh.value = state.ph.goal;
@@ -379,16 +370,6 @@ function attachListeners() {
             Object.values(views).forEach(v => v.classList.add('hidden'));
             btn.classList.add('active');
             views[btn.id].classList.remove('hidden');
-            if (btn.id === 'btn-logs') {
-                elements.logFc.value = state.fc.now;
-                elements.logPh.value = state.ph.now;
-                elements.logTa.value = state.ta.now;
-                elements.logCh.value = state.ch.now;
-                elements.logCya.value = state.cya.now;
-                elements.logSalt.value = state.salt.now;
-                elements.logBorate.value = state.borate.now;
-                elements.logTemp.value = state.temp;
-            }
         });
     });
 
@@ -410,7 +391,7 @@ function attachListeners() {
         [elements.cyaNow, 'cya.now'], [elements.saltNow, 'salt.now'], [elements.borateNow, 'borate.now'], [elements.tempNow, 'temp'],
         [elements.setUnits, 'unit'], [elements.setSize, 'size'], [elements.goalFc, 'fc.goal'], [elements.goalPh, 'ph.goal'],
         [elements.goalTa, 'ta.goal'], [elements.goalCh, 'ch.goal'], [elements.goalCya, 'cya.goal'], [elements.goalSalt, 'salt.goal'],
-        [elements.goalBorate, 'borate.goal'], [elements.setFcPcnt, 'fc.pcnt'], [elements.setFcJug, 'fc.jug'], [elements.setFcPop, 'fc.pop'], [elements.setMaPop, 'ph.mapop']
+        [elements.goalBorate, 'borate.goal'], [elements.setFcPcnt, 'fc.pcnt'], [elements.setFcPop, 'fc.pop'], [elements.setMaPop, 'ph.mapop']
     ].forEach(p => syncInput(p[0], p[1]));
 
     document.querySelectorAll('.step-btn').forEach(btn => {
@@ -432,24 +413,22 @@ function attachListeners() {
         });
     });
 
+    elements.toggleSuggestions.addEventListener('click', () => {
+        elements.suggestionsPanel.classList.toggle('hidden');
+    });
+
     elements.logForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const measurements = {
-            fc: parseFloat(elements.logFc.value), ph: parseFloat(elements.logPh.value),
-            ta: parseFloat(elements.logTa.value), ch: parseFloat(elements.logCh.value),
-            cya: parseFloat(elements.logCya.value), salt: parseFloat(elements.logSalt.value),
-            borate: parseFloat(elements.logBorate.value), temp: parseFloat(elements.logTemp.value)
+            fc: state.fc.now, ph: state.ph.now, ta: state.ta.now,
+            ch: state.ch.now, cya: state.cya.now, salt: state.salt.now,
+            borate: state.borate.now, temp: state.temp
         };
         const maintenance = [];
         document.querySelectorAll('input[name="maint"]:checked').forEach(cb => maintenance.push(cb.parentElement.textContent.trim()));
         state.logs.push({ date: elements.logDate.value, measurements, maintenance, notes: elements.logNotes.value });
-        state.fc.now = measurements.fc; state.ph.now = measurements.ph; state.ta.now = measurements.ta;
-        state.ch.now = measurements.ch; state.cya.now = measurements.cya; state.salt.now = measurements.salt;
-        state.borate.now = measurements.borate; state.temp = measurements.temp;
-        elements.fcNow.value = state.fc.now; elements.phNow.value = state.ph.now; elements.taNow.value = state.ta.now;
-        elements.chNow.value = state.ch.now; elements.cyaNow.value = state.cya.now; elements.saltNow.value = state.salt.now;
-        elements.borateNow.value = state.borate.now; elements.tempNow.value = state.temp;
-        saveState(); updateUI(); renderLogs();
+        saveState();
+        renderLogs();
         document.querySelectorAll('input[name="maint"]').forEach(cb => cb.checked = false);
         elements.logNotes.value = '';
         showToast('Log saved!');
