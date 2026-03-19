@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chemipool</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    <link rel="apple-touch-icon" href="icon.svg">
 </head>
 <body class="dark-theme">
     <header>
@@ -396,6 +399,19 @@
                         <input type="number" id="set-size" value="10000" step="100">
                     </div>
                 </div>
+
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3>Data Management (JSON)</h3>
+                    <div class="input-group">
+                        <label>Current Configuration</label>
+                        <textarea id="json-settings" style="height: 200px; font-family: monospace; font-size: 0.8rem;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="btn-download-json" class="secondary-btn" style="flex: 1;">Download JSON</button>
+                        <button id="btn-upload-json" class="secondary-btn" style="flex: 1;">Upload JSON</button>
+                        <input type="file" id="json-file-input" accept=".json" class="hidden">
+                    </div>
+                </div>
             </div>
 
             <div style="text-align: center; margin-top: 2rem; padding: 1rem; opacity: 0.7; font-size: 0.85rem;">
@@ -407,5 +423,14 @@
     <div id="toast" class="toast hidden"></div>
 
     <script type="module" src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
 </body>
 </html>

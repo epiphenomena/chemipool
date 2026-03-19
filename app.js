@@ -32,6 +32,7 @@ if (!state.maintenanceTasks) state.maintenanceTasks = [...DEFAULT_MAINTENANCE_TA
 
 function saveState() {
     localStorage.setItem('poolState', JSON.stringify(state));
+    if (elements.jsonSettings) updateJsonSettings();
 }
 
 // --- DOM Elements ---
@@ -129,6 +130,10 @@ const elements = {
     btnDownloadCsv: document.getElementById('btn-download-csv'),
     btnUploadCsv: document.getElementById('btn-upload-csv'),
     csvFileInput: document.getElementById('csv-file-input'),
+    jsonSettings: document.getElementById('json-settings'),
+    btnDownloadJson: document.getElementById('btn-download-json'),
+    btnUploadJson: document.getElementById('btn-upload-json'),
+    jsonFileInput: document.getElementById('json-file-input'),
     toast: document.getElementById('toast')
 };
 
@@ -143,6 +148,10 @@ function showToast(msg, btnToDisable = null) {
         elements.toast.classList.add('hidden');
         if (btnToDisable) btnToDisable.disabled = false;
     }, 3000);
+}
+
+function updateJsonSettings() {
+    elements.jsonSettings.value = JSON.stringify(state, null, 2);
 }
 
 // --- Initialization ---
@@ -176,6 +185,7 @@ function init() {
     renderMaintenanceTasksManager();
     updateUI();
     renderLogs();
+    updateJsonSettings();
     attachListeners();
 }
 
@@ -468,6 +478,33 @@ function uploadCSV(file) {
     reader.readAsText(file);
 }
 
+function downloadJSON() {
+    const jsonContent = JSON.stringify(state, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `pool_state_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function uploadJSON(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const newState = JSON.parse(e.target.result);
+            state = { ...DEFAULT_STATE, ...newState };
+            saveState();
+            window.location.reload();
+        } catch (err) {
+            showToast("Error parsing JSON file");
+        }
+    };
+    reader.readAsText(file);
+}
+
 function attachListeners() {
     const views = { 'btn-measurements': elements.viewMeasurements, 'btn-logs': elements.viewLogs, 'btn-settings': elements.viewSettings };
     const btns = [elements.btnMeasurements, elements.btnLogs, elements.btnSettings];
@@ -558,6 +595,24 @@ function attachListeners() {
     elements.btnUploadCsv.addEventListener('click', () => elements.csvFileInput.click());
     elements.csvFileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) uploadCSV(e.target.files[0]);
+    });
+
+    elements.btnDownloadJson.addEventListener('click', downloadJSON);
+    elements.btnUploadJson.addEventListener('click', () => elements.jsonFileInput.click());
+    elements.jsonFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) uploadJSON(e.target.files[0]);
+    });
+
+    elements.jsonSettings.addEventListener('change', () => {
+        try {
+            const newState = JSON.parse(elements.jsonSettings.value);
+            state = { ...DEFAULT_STATE, ...newState };
+            saveState();
+            window.location.reload();
+        } catch (err) {
+            showToast("Invalid JSON in textarea");
+            updateJsonSettings();
+        }
     });
 }
 
