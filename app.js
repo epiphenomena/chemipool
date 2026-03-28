@@ -22,13 +22,15 @@ const DEFAULT_STATE = {
     borate: { now: 0, goal: 0, pop: 0 },
     temp: 84,
     logs: [],
-    maintenanceTasks: DEFAULT_MAINTENANCE_TASKS
+    maintenanceTasks: DEFAULT_MAINTENANCE_TASKS,
+    changedMeasurements: {}
 };
 
 let state = JSON.parse(localStorage.getItem('poolState')) || DEFAULT_STATE;
 state = { ...DEFAULT_STATE, ...state };
 if (!state.logs) state.logs = [];
 if (!state.maintenanceTasks) state.maintenanceTasks = [...DEFAULT_MAINTENANCE_TASKS];
+if (!state.changedMeasurements) state.changedMeasurements = {};
 
 function saveState() {
     localStorage.setItem('poolState', JSON.stringify(state));
@@ -391,6 +393,7 @@ function renderLogs() {
                 <div><span>CH:</span> <b>${log.measurements.ch ?? '-'}</b></div>
                 <div><span>CYA:</span> <b>${log.measurements.cya ?? '-'}</b></div>
                 <div><span>Salt:</span> <b>${log.measurements.salt ?? '-'}</b></div>
+                <div><span>Borate:</span> <b>${log.measurements.borate ?? '-'}</b></div>
                 <div><span>Temp:</span> <b>${log.measurements.temp ?? '-'}</b></div>
             </div>
             ${maintStr ? `<div class="log-item-maint">Maintenance: ${maintStr}</div>` : ''}
@@ -451,18 +454,20 @@ function uploadCSV(file) {
         for (let i = 1; i < lines.length; i++) {
             if (!lines[i].trim()) continue;
             const values = lines[i].split(',');
+            
+            const measurements = {};
+            const measureMap = {
+                fc: 1, ph: 2, ta: 3, ch: 4, cya: 5, salt: 6, borate: 7, temp: 8
+            };
+            
+            Object.entries(measureMap).forEach(([key, index]) => {
+                const val = parseFloat(values[index]);
+                if (!isNaN(val)) measurements[key] = val;
+            });
+
             const entry = {
                 date: values[0],
-                measurements: {
-                    fc: parseFloat(values[1]),
-                    ph: parseFloat(values[2]),
-                    ta: parseFloat(values[3]),
-                    ch: parseFloat(values[4]),
-                    cya: parseFloat(values[5]),
-                    salt: parseFloat(values[6]),
-                    borate: parseFloat(values[7]),
-                    temp: parseFloat(values[8])
-                },
+                measurements,
                 maintenance: values[9] ? values[9].split(';') : [],
                 notes: values[10] || ""
             };
@@ -526,6 +531,15 @@ function attachListeners() {
             const parts = path.split('.');
             for (let i = 0; i < parts.length - 1; i++) current = current[parts[i]];
             current[parts[parts.length - 1]] = val;
+
+            // Track changes for logs
+            const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
+            measureKeys.forEach(key => {
+                if (path === key || path === key + '.now') {
+                    state.changedMeasurements[key] = true;
+                }
+            });
+
             updateUI();
             saveState();
         });
@@ -575,14 +589,22 @@ function attachListeners() {
 
     elements.logForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const measurements = {
-            fc: state.fc.now, ph: state.ph.now, ta: state.ta.now,
-            ch: state.ch.now, cya: state.cya.now, salt: state.salt.now,
-            borate: state.borate.now, temp: state.temp
-        };
+        
+        const measurements = {};
+        const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
+        measureKeys.forEach(key => {
+            if (state.changedMeasurements[key]) {
+                measurements[key] = key === 'temp' ? state.temp : state[key].now;
+            }
+        });
+
         const maintenance = [];
         document.querySelectorAll('input[name="maint"]:checked').forEach(cb => maintenance.push(cb.parentElement.textContent.trim()));
         state.logs.push({ date: elements.logDate.value, measurements, maintenance, notes: elements.logNotes.value });
+        
+        // Reset changes after saving log
+        state.changedMeasurements = {};
+        
         saveState();
         renderLogs();
         updateDaysSinceLog();
