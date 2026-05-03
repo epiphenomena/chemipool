@@ -23,7 +23,8 @@ const DEFAULT_STATE = {
     temp: 84,
     logs: [],
     maintenanceTasks: DEFAULT_MAINTENANCE_TASKS,
-    changedMeasurements: {}
+    changedMeasurements: {},
+    measurementClean: {}
 };
 
 let state = JSON.parse(localStorage.getItem('poolState')) || DEFAULT_STATE;
@@ -158,6 +159,14 @@ function updateJsonSettings() {
 
 // --- Initialization ---
 
+function markAllMeasurementsClean() {
+    const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
+    measureKeys.forEach(key => {
+        state.changedMeasurements[key] = false;
+        state.measurementClean[key] = true;
+    });
+}
+
 function init() {
     // Fill inputs with state
     elements.setUnits.value = state.unit;
@@ -188,6 +197,7 @@ function init() {
     updateUI();
     renderLogs();
     updateJsonSettings();
+    markAllMeasurementsClean();
     attachListeners();
 }
 
@@ -380,21 +390,24 @@ function renderLogs() {
         const item = document.createElement('div');
         item.className = 'log-item';
         const maintStr = log.maintenance.join(', ');
-
+        
+        // Check if measurements are inherited (not in log.measurements)
+        const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
+        
         item.innerHTML = `
             <div class="log-item-header">
                 <span class="log-item-date">${log.date}</span>
                 <button class="btn-delete" data-date="${log.date}" data-index="${index}">Delete</button>
             </div>
             <div class="log-item-stats">
-                <div><span>FC:</span> <b>${log.measurements.fc ?? '-'}</b></div>
-                <div><span>pH:</span> <b>${log.measurements.ph ?? '-'}</b></div>
-                <div><span>TA:</span> <b>${log.measurements.ta ?? '-'}</b></div>
-                <div><span>CH:</span> <b>${log.measurements.ch ?? '-'}</b></div>
-                <div><span>CYA:</span> <b>${log.measurements.cya ?? '-'}</b></div>
-                <div><span>Salt:</span> <b>${log.measurements.salt ?? '-'}</b></div>
-                <div><span>Borate:</span> <b>${log.measurements.borate ?? '-'}</b></div>
-                <div><span>Temp:</span> <b>${log.measurements.temp ?? '-'}</b></div>
+                ${measureKeys.map(key => {
+                    const value = log.measurements[key];
+                    const isFaded = value === undefined || value === null;
+                    return `<div class="${isFaded ? 'faded-measurement' : ''}">
+                        <span>${key.toUpperCase()}:</span> 
+                        <b>${value ?? '-'}</b>
+                    </div>`;
+                }).join('\n')}
             </div>
             ${maintStr ? `<div class="log-item-maint">Maintenance: ${maintStr}</div>` : ''}
             ${log.notes ? `<div class="log-item-notes">${log.notes}</div>` : ''}
@@ -532,11 +545,12 @@ function attachListeners() {
             for (let i = 0; i < parts.length - 1; i++) current = current[parts[i]];
             current[parts[parts.length - 1]] = val;
 
-            // Track changes for logs
+            // Track changes for logs - mark as dirty
             const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
             measureKeys.forEach(key => {
                 if (path === key || path === key + '.now') {
                     state.changedMeasurements[key] = true;
+                    state.measurementClean[key] = false;
                 }
             });
 
@@ -593,7 +607,7 @@ function attachListeners() {
         const measurements = {};
         const measureKeys = ['fc', 'ph', 'ta', 'ch', 'cya', 'salt', 'borate', 'temp'];
         measureKeys.forEach(key => {
-            if (state.changedMeasurements[key]) {
+            if (state.changedMeasurements[key] && !state.measurementClean[key]) {
                 measurements[key] = key === 'temp' ? state.temp : state[key].now;
             }
         });
@@ -602,8 +616,9 @@ function attachListeners() {
         document.querySelectorAll('input[name="maint"]:checked').forEach(cb => maintenance.push(cb.parentElement.textContent.trim()));
         state.logs.push({ date: elements.logDate.value, measurements, maintenance, notes: elements.logNotes.value });
         
-        // Reset changes after saving log
+        // Reset changes after saving log and mark all as clean
         state.changedMeasurements = {};
+        markAllMeasurementsClean();
         
         saveState();
         renderLogs();

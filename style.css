@@ -479,6 +479,11 @@ textarea {
     color: var(--text-dim);
 }
 
+.faded-measurement {
+    opacity: 0.4;
+    font-style: italic;
+}
+
 .btn-delete {
     background: none;
     border: none;

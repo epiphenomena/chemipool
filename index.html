@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>chemipool</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260503">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="apple-touch-icon" href="icon.svg">
@@ -306,6 +306,13 @@
 
         <!-- Settings View -->
         <section id="view-settings" class="view hidden">
+            <div class="card" style="grid-column: 1 / -1;">
+                <h3>Version</h3>
+                <div class="input-group">
+                    <label>App Version</label>
+                    <input type="text" id="app-version" value="v1.0.0-20260503" readonly style="background: #121212; color: var(--text-dim);">
+                </div>
+            </div>
             <div class="card-grid">
                 <div class="card">
                     <h3>Goal Levels</h3>
@@ -422,7 +429,7 @@
 
     <div id="toast" class="toast hidden"></div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app.js?v=20260503"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
